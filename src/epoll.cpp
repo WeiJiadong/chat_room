@@ -24,15 +24,16 @@ bool Epoll::addFd(int fd, int eventsOption)
 {
     bool res = false;
     int flag = NG;
+    struct epoll_event event;
 
     if (IsOK(this->m_Epollfd)) {
-        this->m_Events[m_EventIndex].events  = eventsOption;
-        this->m_Events[m_EventIndex].data.fd = this->m_Epollfd;
+        event.events  = eventsOption;
+        event.data.fd = fd;
         flag = epoll_ctl(this->m_Epollfd, EPOLL_CTL_ADD, fd,
-                         &this->m_Events[m_EventIndex]);
+                         &event);
         if (IsOK(flag)) {
             res = true;
-            this->m_EventIndex++;
+            this->m_EventCount++;
         }/*end if*/
     }/*end if*/
 
@@ -43,14 +44,15 @@ bool Epoll::delFd(const int eventIndex)
 {
     bool res = false;
     int flag = NG;
+    struct epoll_event event;
 
     if (IsOK(this->m_Epollfd)) {
         flag = epoll_ctl(this->m_Epollfd, EPOLL_CTL_DEL,
                          this->m_Events[eventIndex].data.fd,
-                         &this->m_Events[eventIndex]);
+                         &event);
         if (IsOK(flag)) {
             res = true;
-            this->m_EventIndex--;
+            this->m_EventCount--;
         }/*end if*/
     }/*end if*/
 
@@ -61,9 +63,10 @@ bool Epoll::changeEvent(const int eventIndex, int eventsOption)
 {
     bool res = false;
     int flag = NG;
+    struct epoll_event event;
 
     if (IsOK(this->m_Epollfd)) {
-        this->m_Events[eventIndex].events = eventsOption; 
+        event.events = eventsOption;
         flag = epoll_ctl(this->m_Epollfd, EPOLL_CTL_MOD,
                          this->m_Events[eventIndex].data.fd,
                          &this->m_Events[eventIndex]);
@@ -78,18 +81,17 @@ bool Epoll::changeEvent(const int eventIndex, int eventsOption)
 /*等待函数*/
 int Epoll::waitEvents(int timeout)
 {
-    bool res = false;
     int flag = NG;
 
     if (IsOK(this->m_Epollfd)) {
         flag = epoll_wait(this->m_Epollfd, this->m_Events,
-                          this->m_EventIndex + 1, timeout);
+                          this->m_EventCount, timeout);
         if (IsOK(flag)) {
-            res = true;
+            this->m_EventIndex = flag - 1;
         }/*end if*/
     }/*end if*/
 
-    return res;
+    return flag;
 }
 
 /*获取变化的文件描述符*/
@@ -97,11 +99,23 @@ int Epoll::getEventOccurfd(const int eventIndex) const
 {
     int fd = NG;
 
-    if (IsOK(this->m_Epollfd) && this->m_EventIndex >= eventIndex) {
+    if (IsOK(this->m_Epollfd)) {
         fd = this->m_Events[eventIndex].data.fd;
     }/*end if*/
 
     return fd;
+}
+
+/*获取对应的事件*/
+int Epoll::getEvents(const int eventIndex) const
+{
+    int events = NG;
+
+    if (IsOK(this->m_Epollfd)) {
+        events = this->m_Events[eventIndex].events;
+    }/*end if*/
+
+    return events;
 }
 
 /*Epoll 析构函数*/

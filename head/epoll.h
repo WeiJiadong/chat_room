@@ -27,6 +27,7 @@ public:
 private:
     int m_Epollfd;
     int m_EventIndex;
+    int m_EventCount;
     struct epoll_event m_Events[EPOLL_MAX_SIZE];
 };
 
