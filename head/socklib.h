@@ -10,11 +10,9 @@
 
 #include <string>
 #include <iostream>
+#include <tools.h>
 
 using namespace std;
-
-#define OK      (0)
-#define NG      (-1)
 
 #define MAX     (4096)
 
@@ -30,17 +28,15 @@ public:
     bool     create(int domain = AF_INET, int type = SOCK_STREAM,
                     int protocol = 0);
     bool     bind(int port, string host = LOCAL);
-    bool     listen(int connum = 1) const;
+    bool     listen(int connum = 10) const;
     bool     accept(Socket &mesg) const;
     bool     connect(int port, string host = LOCAL);
-    bool     recvMesg(Socket &mesg, string &recv_buf);
     bool     sendMesg(Socket &mesg, string &send_buf);
+    int      recvMesg(Socket &mesg, string &recv_buf);
     sockfd_t getFd() const;
     virtual ~Socket();
 
 private:
-    bool IsOk(int res) const;
-
     sockfd_t       m_Sockfd;
     struct sockaddr_in m_addr;
 };
