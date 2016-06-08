@@ -27,10 +27,10 @@ public:
     Socket(sockfd_t fd = NG);
     bool     create(int domain = AF_INET, int type = SOCK_STREAM,
                     int protocol = 0);
-    bool     bind(int port, string host = LOCAL);
+    bool     bind(int port = PORT, string host = LOCAL);
     bool     listen(int connum = 10) const;
     bool     accept(Socket &mesg) const;
-    bool     connect(int port, string host = LOCAL);
+    bool     connect(int port = PORT, string host = LOCAL);
     bool     sendMesg(Socket &mesg, string &send_buf);
     int      recvMesg(Socket &mesg, string &recv_buf);
     sockfd_t getFd() const;

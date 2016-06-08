@@ -38,7 +38,7 @@ void SockExc::connect(int port, string host)
 }
 
 /*发送消息*/
-void SockExc::sendMesg(Socket &socket, string &send_buf)
+void SockExc::sendMesg(string &send_buf, SockExc &socket)
 {
     if (!IsOK(Socket::getFd()) || !Socket::sendMesg(socket, send_buf)) {
         throw Exception("消息接收失败！\n");
@@ -46,7 +46,7 @@ void SockExc::sendMesg(Socket &socket, string &send_buf)
 }
 
 /*接收消息*/
-int SockExc::recvMesg(Socket &socket, string &recv_buf)
+int SockExc::recvMesg(string &recv_buf, SockExc &socket)
 {
     int flag = NG;
 
